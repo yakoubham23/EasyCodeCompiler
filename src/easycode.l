@@ -1,60 +1,57 @@
 %{
-#include "y.tab.h" // Inclure les definitions des tokens
+#include <stdio.h>
+int nb_ligne = 1;
 %}
 
-%%
-
-DEBUT      { return DEBUT; }
-FIN        { return FIN; }
-EXECUTION  { return EXECUTION; }
-SI         { return SI; }
-ALORS      { return ALORS; }
-SINON      { return SINON; }
-TANTQUE    { return TANTQUE; }
-FAIRE      { return FAIRE; }
-FIXE       { return FIXE; }
-NUM        { return NUM; }
-REAL       { return REAL; }
-TEXT       { return TEXT; }
-
-[A-Za-z][A-Za-z0-9_]{0,9}   { return IDENTIFIANT; }
-
-\+         { return PLUS; }
-\-         { return MOINS; }
-\*         { return MULT; }
-\/         { return DIV; }
-
-ET         { return ET; }
-OU         { return OU; }
-NON        { return NON; }
-=          { return EGAL; }
-!=         { return DIFF; }
-<          { return INF; }
-<=         { return INFEGAL; }
->          { return SUP; }
->=         { return SUPEGAL; }
-
-[0-9]+     { return LITTERAL_NUM; }
-[0-9]*\.[0-9]+ { return LITTERAL_REAL; }
-\"[^\"]*\"  { return LITTERAL_TEXT; }
-
-:          { return DEUX_POINTS; }
-;          { return POINT_VIRGULE; }
-=          { return EGAL; }
-\->        { return ARROW; }
-\(         { return PARENTHESIS_O; }
-\)         { return PARENTHESIS_F; }
-\{         { return ACCOLADE_O; }
-\}         { return ACCOLADE_F; }
---         { return COMMENTAIRE_LIGNE; }
-##         { return COMMENTAIRE_FIN; }
-\{-        { return COMMENTAIRE_ML_DEB; }
--\}        { return COMMENTAIRE_ML_FIN; }
-
-[ \t\n]+   { /* ignore whitespaces */ }
+lettre [a-zA-Z]
+chiffre [0-9]
+IDF {lettre}({lettre}|{chiffre})*
+cst {chiffre}+
+reel {chiffre}+"."+{chiffre}+
+string \"[^\"]*\"
+commentaire1 "--"([^#]*"##")
+commentaire2 "\\{-"([^\\-]*"\\-\\}")
 
 %%
 
-int yywrap() {
-    return 1;
+"DEBUT"              printf("DEBUT reconnu\n");
+"FIN"                printf("FIN reconnu\n");
+"EXECUTION"          printf("EXECUTION reconnu\n");
+"NUM"                printf("NUM reconnu\n");
+"REAL"               printf("REAL reconnu\n");
+"TEXT"               printf("TEXT reconnu\n");
+"FIXE"               printf("FIXE reconnu\n");
+"SI"                 printf("SI reconnu\n");
+"ALORS"              printf("ALORS reconnu\n");
+"SINON"              printf("SINON reconnu\n");
+"TANTQUE"            printf("TANTQUE reconnu\n");
+"FAIRE"              printf("FAIRE reconnu\n");
+
+{IDF}                printf("IDF reconnu %s\n", yytext);
+{reel}               printf("REEL reconnu %s\n", yytext);
+{cst}                printf("CST reconnu %s\n", yytext);
+{string}             printf("STRING reconnu %s\n", yytext);
+":"                  printf("deux-points reconnu\n");
+"<-"                 printf("affectation reconnu\n");
+";"                  printf("pvg reconnu\n");
+{commentaire1}       printf("commentaire 1 reconnu\n");
+{commentaire2}       printf("commentaire 2 reconnu\n");
+
+[ \t]+               ; /* Ignore multiple whitespace characters */
+\n                   { nb_ligne++; }
+.                    { printf("erreur lexicale à la ligne %d\n", nb_ligne); }
+
+%%
+
+int main() {
+    FILE *file;
+    file = fopen("test.txt", "r");
+    if (file == NULL) {
+        printf("ERROR: Cannot open test.txt\n");
+    } else {
+        yyin = file;
+        yylex();
+        fclose(file);
+    }
+    return 0;
 }

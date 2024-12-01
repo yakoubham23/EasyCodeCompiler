@@ -1,0 +1,4 @@
+DEBUT
+NUM : x;
+x <- 5;
+FIN
