@@ -1,0 +1,7 @@
+DEBUT
+-- Déclaration de variables ##
+NUM : a;
+REAL : b;
+TEXT : c;
+{- Ce commentaire est multi-lignes -}
+FIN

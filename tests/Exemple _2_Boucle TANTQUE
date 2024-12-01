@@ -1,0 +1,7 @@
+DEBUT
+NUM : compteur;
+compteur <- 0;
+TANTQUE (compteur < 10) FAIRE {
+    compteur <- compteur + 1;
+}
+FIN
