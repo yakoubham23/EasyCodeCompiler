@@ -1,0 +1,9 @@
+DEBUT
+-- Ceci est un commentaire ##
+NUM : compteur;
+compteur <- 10; -- Initialisation ##
+{-
+Ce commentaire
+couvre plusieurs lignes.
+-}
+FIN

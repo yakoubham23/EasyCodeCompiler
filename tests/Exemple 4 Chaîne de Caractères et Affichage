@@ -1,5 +1,0 @@
-DEBUT
-TEXT : message;
-message <- "Bonjour, monde!";
-affiche(message);
-FIN

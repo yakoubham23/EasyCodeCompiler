@@ -1,0 +1,9 @@
+DEBUT
+NUM : x;
+REAL : pi;
+TEXT : message;
+
+x <- 5;
+pi <- 3.14;
+message <- "Bonjour";
+FIN

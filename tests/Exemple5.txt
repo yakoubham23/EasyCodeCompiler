@@ -1,0 +1,10 @@
+DEBUT
+NUM : age;
+age <- 20;
+
+SI (age >= 18) ALORS {
+    affiche("Majeur");
+} SINON {
+    affiche("Mineur");
+}
+FIN

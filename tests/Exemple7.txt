@@ -1,0 +1,20 @@
+DEBUT
+NUM : a;
+NUM : b;
+NUM : result;
+
+a <- 10;
+b <- 20;
+
+result <- a + b;  -- Addition ##
+affiche(result);
+
+result <- a * b;  -- Multiplication ##
+affiche(result);
+
+SI (a < b) ALORS {
+    affiche("a est inférieur à b");
+} SINON {
+    affiche("a est supérieur ou égal à b");
+}
+FIN

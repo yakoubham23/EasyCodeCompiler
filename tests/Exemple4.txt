@@ -1,0 +1,5 @@
+DEBUT
+FIXE NUM : MAX_VALEUR = 100;
+NUM : x;
+x <- MAX_VALEUR;
+FIN

@@ -1,7 +1,9 @@
 DEBUT
 NUM : compteur;
 compteur <- 0;
+
 TANTQUE (compteur < 10) FAIRE {
+    affiche("Compteur: " + compteur);
     compteur <- compteur + 1;
 }
 FIN
