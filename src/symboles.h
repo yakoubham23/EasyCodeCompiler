@@ -5,40 +5,27 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Taille de la table des symboles (peut être dynamique si nécessaire)
-#define MAX_SYMBOLS 100
+typedef struct Symbol {
+    char* name;     // Nom de la variable
+    char* type;     // Type de la variable (NUM, REAL, etc.)
+    int value;      // Valeur de la variable (utilisée pour les types numériques)
+    struct Symbol* next;
+} Symbol;
 
-// Types de données possibles
-typedef enum { NUM, REAL, TEXT, TABLEAU, FONCTION, STRUCTURE } Type;
+typedef struct SymbolTable {
+    Symbol* head;   // Liste chainée pour stocker les symboles
+} SymbolTable;
 
-// Statut de la variable (modifiable ou constante)
-typedef enum { VARIABLE, CONSTANTE } Statut;
+// Création d'une table des symboles vide
+SymbolTable* create_symbol_table();
 
-// Structure représentant une entrée dans la table des symboles
-typedef struct {
-    char nom[20];     // Nom de la variable/constante
-    Type type;        // Type de la donnée (NUM, REAL, TEXT, etc.)
-    union {
-        int int_val;       // Valeur de type NUM
-        float real_val;    // Valeur de type REAL
-        char text_val[20]; // Valeur de type TEXT
-        void *tableau_val; // Pointeur pour les tableaux dynamiques
-    };
-    Statut statut;    // Si la variable est constante ou modifiable
-    int taille;       // Taille pour les tableaux, sinon 0
-    int modifiable;   // 1 si modifiable, 0 si constante
-    int declaree;     // 1 si la variable a été déclarée
-} Symbole;
+// Recherche d'un symbole par son nom
+Symbol* lookup_symbol(SymbolTable* table, const char* name);
 
-// Déclaration de la table des symboles
-extern Symbole table[MAX_SYMBOLS];
-extern int nb_symbols;  // Nombre d'éléments dans la table
+// Insertion d'un nouveau symbole dans la table
+void insert_symbol(SymbolTable* table, const char* name, const char* type);
 
-// Déclarations des fonctions
-int ajouterSymbole(char *nom, Type type, Statut statut, int taille, int modifiable, void *valeur);
-Symbole* rechercherSymbole(char *nom);
-void afficherTableDesSymboles();
-int supprimerSymbole(char *nom);
-void reinitialiserTableDesSymboles();
+// Libération de la mémoire de la table des symboles
+void free_symbol_table(SymbolTable* table);
 
 #endif
