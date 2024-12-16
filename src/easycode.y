@@ -2,12 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "symbol_table.h"
+#include "symboles.h"
 
-// Déclaration de la table des symboles
-extern SymbolTable* symbolTable;
+SymbolTable* symbolTable;
 
-// Déclaration des fonctions sémantiques
 void declaration_error(const char* id);
 void check_type_error(const char* id, const char* expected, const char* actual);
 void undeclared_variable_error(const char* id);
@@ -32,8 +30,13 @@ void constant_reassignment_error(const char* id);
 %token ADD SUB MUL DIV
 %token LPAREN RPAREN LBRACE RBRACE
 
-%type <str> variable
+%type <str> type
 %type <num> expression
+
+%left ADD SUB    // Priorité de gauche pour les opérateurs ADD et SUB
+%left MUL DIV    // Priorité de gauche pour les opérateurs MUL et DIV
+%left AND OR     // Priorité de gauche pour les opérateurs logiques
+%right EQ NEQ LT LE GT GE  // Priorité de droite pour les comparaisons
 
 %%
 
@@ -47,11 +50,11 @@ declarations:
 ;
 
 declaration:
-    type IDENTIFIER { 
-        if (lookup_symbol($2) != NULL) {
+    type IDENTIFIER {
+        if (lookup_symbol(symbolTable, $2) != NULL) {
             declaration_error($2);
         } else {
-            insert_symbol($2, $1);
+            insert_symbol(symbolTable, $2, $1);
         }
     }
 ;
@@ -70,13 +73,15 @@ instructions:
 
 instruction:
     IDENTIFIER ASSIGN expression {
-        if (lookup_symbol($1) == NULL) {
+        Symbol* symbol = lookup_symbol(symbolTable, $1);
+        if (symbol == NULL) {
             undeclared_variable_error($1);
         } else {
-            if (strcmp(lookup_symbol($1)->type, "FIXE") == 0) {
+            if (strcmp(symbol->type, "FIXE") == 0) {
                 constant_reassignment_error($1);
             } else {
-                check_type_error($1, lookup_symbol($1)->type, "NUM");
+                check_type_error($1, symbol->type, "NUM");
+                symbol->value = $3;  // Met à jour la valeur de la variable
                 printf("Affectation : %s <- %d\n", $1, $3);
             }
         }
@@ -93,16 +98,18 @@ expression:
     NUM { $$ = $1; }
     | REAL { $$ = $1; }
     | IDENTIFIER { 
-        if (lookup_symbol($1) == NULL) {
+        Symbol* symbol = lookup_symbol(symbolTable, $1);
+        if (symbol == NULL) {
             undeclared_variable_error($1);
         } else {
-            $$ = lookup_symbol($1)->value;
+            $$ = symbol->value;  // Récupère la valeur de la variable
         }
     }
+    | LPAREN expression RPAREN { $$ = $2; } // Parenthèses pour priorités
     | expression ADD expression { $$ = $1 + $3; }
     | expression SUB expression { $$ = $1 - $3; }
     | expression MUL expression { $$ = $1 * $3; }
-    | expression DIV expression { 
+    | expression DIV expression {
         if ($3 == 0) {
             division_by_zero_error();
         } else {
@@ -112,8 +119,6 @@ expression:
 ;
 
 %%
-
-// Implémentation des fonctions sémantiques
 
 void declaration_error(const char* id) {
     fprintf(stderr, "Erreur: Déclaration multiple de la variable '%s'.\n", id);
@@ -143,6 +148,8 @@ void constant_reassignment_error(const char* id) {
 }
 
 int main() {
+    symbolTable = create_symbol_table(); // Création de la table des symboles
     yyparse();
+    free_symbol_table(symbolTable);  // Libération de la mémoire de la table des symboles
     return 0;
 }
