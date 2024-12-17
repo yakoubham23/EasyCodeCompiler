@@ -1,4 +1,37 @@
+-- Début du programme --
 DEBUT
-NUM : x;
-x <- 5;
+
+FIXE NUM1 <- 12345;        
+FIXE NUM2 <- -32768;         
+FIXE NUM3 <- 999999;         
+FIXE REEL1 <- 123.456;       
+FIXE REEL2 <- -32769.123; 
+
+TEXTE T1 <- "Ceci est un texte";   
+TEXTE T2 <- "Un autre texte";
+
+-- Test des commentaires --
+-- Ceci est un commentaire sur une ligne ##
+{- Ceci est un commentaire
+multi-lignes ignoré -}
+
+SI NUM1 > NUM2 ALORS
+    affiche "NUM1 est plus grand";
+SINON
+    affiche "NUM2 est plus grand";
+FIN
+
+-- Test des identifiants ##
+IDF1 <- 42;
+IDF_TROP_LONG123456 <- 10;   -- [ERROR] Identifiant trop long ##
+
+-- Tests des opérateurs ##
+a <- b + c * d / e - f;   
+x <- (a + b) * c;
+y <- [1, 2, 3];
+
+TANTQUE x <= 10 FAIRE
+    x <- x + 1;
+FIN
+
 FIN

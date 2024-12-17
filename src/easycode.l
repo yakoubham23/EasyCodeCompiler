@@ -5,7 +5,10 @@
   #include<stdio.h>
   #include <string.h>
   int nb_ligne=1;
-  int nb_colonne=1;    
+  int nb_colonne=1;   
+  #define LETTRE [a-zA-Z]
+  #define CHIFFRE [0-9]
+  #define UNDERSCORE [_] 
 %}
 
 /* Expressions régulières */
@@ -21,6 +24,9 @@ SIGNEDREAL [+-]?{REAL}
 TEXT \"[^\"]*\"
 commentaire_sur_ligne --[^\n]*##
 commentaire_multi_lignes \{-(.|\n)*?-\}
+
+
+
 
 
 /* Règles de production */
@@ -65,17 +71,18 @@ commentaire_multi_lignes \{-(.|\n)*?-\}
 
 {IDF} {
   if (strlen(yytext) > 10) {
-    printf("\033[31m[ERROR] Identifiant trop long : %s a la ligne %d, colonne %d\033[0m\n", yytext, nb_ligne, nb_colonne);
+    printf("\033[31m[ERROR] Identifiant trop long : %s a la ligne %d\033[0m\n", yytext, nb_ligne);
   } else {
-    printf("\033[32m[SUCCESS] Identifiant valide : %s a la ligne %d, colonne %d\033[0m\n", yytext, nb_ligne, nb_colonne);
+    printf("\033[32m[SUCCESS] Identifiant valide : %s a la ligne %d\033[0m\n", yytext, nb_ligne);
   }
   nb_colonne += strlen(yytext);
 }
+
+
 {commentaire_sur_ligne} { 
   nb_colonne += strlen(yytext); 
   printf("\033[34m[INFO] Commentaire sur une ligne ignore\033[0m\n"); 
 }
-
 {commentaire_multi_lignes} { 
   char *ptr = yytext; 
   while ((ptr = strchr(ptr, '\n')) != NULL) { 
@@ -86,6 +93,7 @@ commentaire_multi_lignes \{-(.|\n)*?-\}
   printf("\033[34m[INFO] Commentaire multi-lignes ignore\033[0m\n");
 }
 
+
 {TEXT} { 
   printf("\033[32m[SUCCESS] Texte reconnu: %s\033[0m\n", yytext); 
   nb_colonne += strlen(yytext); 
@@ -94,7 +102,7 @@ commentaire_multi_lignes \{-(.|\n)*?-\}
 {NUM} {
   int val = atoi(yytext); 
   if (val < 0 || val > 32767) {
-    printf("\033[31m[ERROR] Nombre hors plage (%s) à la ligne %d, colonne %d\033[0m\n", yytext, nb_ligne, nb_colonne); 
+    printf("\033[31m[ERROR] Nombre hors plage (%s) a la ligne %d\033[0m\n", yytext, nb_ligne); 
   } else {
     printf("\033[32m[SUCCESS] Nombre valide: %s\033[0m\n", yytext);
   }
@@ -104,7 +112,7 @@ commentaire_multi_lignes \{-(.|\n)*?-\}
 {SIGNEDNUM} { 
   int val = atoi(yytext); 
   if (val < -32768 || val > 32767) {
-    printf("\033[31m[ERROR] Nombre signe hors plage (%s) à la ligne %d, colonne %d\033[0m\n", yytext, nb_ligne, nb_colonne); 
+    printf("\033[31m[ERROR] Nombre signe hors plage (%s) a la ligne %d\033[0m\n", yytext, nb_ligne); 
   } else {
     printf("\033[32m[SUCCESS] Nombre signe valide: %s\033[0m\n", yytext);
   }
@@ -114,7 +122,7 @@ commentaire_multi_lignes \{-(.|\n)*?-\}
 {REAL} { 
   double val = atof(yytext); 
   if (val < 0.0 || val > 32767.0) {
-    printf("\033[31m[ERROR] Reel hors plage (%s) à la ligne %d, colonne %d\033[0m\n", yytext, nb_ligne, nb_colonne); 
+    printf("\033[31m[ERROR] Reel hors plage (%s) a la ligne %d\033[0m\n", yytext, nb_ligne); 
   } else {
     printf("\033[32m[SUCCESS] Reel valide: %s\033[0m\n", yytext); 
   }
@@ -124,7 +132,7 @@ commentaire_multi_lignes \{-(.|\n)*?-\}
 {SIGNEDREAL} { 
   double val = atof(yytext); 
   if (val < -32768.0 || val > 32767.0) {
-    printf("\033[31m[ERROR] Reel signe hors plage (%s)  a la ligne %d, colonne %d\033[0m\n", yytext, nb_ligne, nb_colonne); 
+    printf("\033[31m[ERROR] Reel signe hors plage (%s)  a la ligne %d\033[0m\n", yytext, nb_ligne); 
   } else {
     printf("\033[32m[SUCCESS] Reel signe valide: %s\033[0m\n", yytext); 
   }
@@ -133,15 +141,16 @@ commentaire_multi_lignes \{-(.|\n)*?-\}
 
 
 
-
 \n { 
   nb_ligne++; 
   nb_colonne = 1; 
 }
 
-[ \t]+ { 
-  nb_colonne += yyleng; 
+
+[ \t]+ {
+  nb_colonne += yyleng; // Ignorer les espaces et les tabulations
 }
+
 %%
 
 int main(int argc, char **argv) {

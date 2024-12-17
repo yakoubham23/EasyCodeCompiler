@@ -1,9 +1,0 @@
-DEBUT
-NUM : age;
-FIXE NUM : MAJEUR = 18;
-SI (age >= MAJEUR) ALORS {
-    affiche("Vous êtes majeur.");
-} SINON {
-    affiche("Vous êtes mineur.");
-}
-FIN
